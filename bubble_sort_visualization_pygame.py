@@ -18,5 +18,13 @@ ORANGE = (255, 165, 0)
 # bar-related constants
 ARRAY_SIZE = 20
 BAR_WIDTH = WIDTH // ARRAY_SIZE
-BAR_HEIGHT = HEIGHT - 50
+MAX_HEIGHT = HEIGHT - 50
 SPEED = 250 # initial sorting speed in millisecond
+
+def generate_random_array(size):
+    """Generate a random array of integers."""
+    return [random.randint(10, MAX_HEIGHT) for _ in range(size)]
+
+if __name__ == "__main__":
+    random_array = generate_random_array(ARRAY_SIZE)
+    print("generated array: ", random_array)
