@@ -31,21 +31,35 @@ def generate_random_array(size):
     """Generate a random array of integers."""
     return [random.randint(10, MAX_HEIGHT) for _ in range(size)]
 
-def draw_bars(array):
+def draw_bars(array, comparisons=None, swaps=None, sorted_indices=None, comparisons_count=0, swaps_count=0):
     """Draws the bars on the screen."""
     SCREEN.fill(BLACK)
 
     for index, value in enumerate(array):
+        # determine the color of the bar based on its state
+        color = WHITE
+        if sorted_indices and index in sorted_indices:
+            color = GREEN
+        elif swaps and index in swaps: 
+            color = ORANGE
+        elif comparisons and index in comparisons:
+            color = RED
+
         # position and size of the bar
         bar_rect = pygame.Rect(index * BAR_WIDTH, HEIGHT - value, BAR_WIDTH - 1, value)
-
         # draw the bar
-        pygame.draw.rect(SCREEN, WHITE, bar_rect)
+        pygame.draw.rect(SCREEN, color, bar_rect)
 
         # display number above the bar
         number_text = FONT.render(str(value), True, WHITE)
         text_rect = number_text.get_rect(center=(index * BAR_WIDTH + BAR_WIDTH // 2, HEIGHT - value - 15))
         SCREEN.blit(number_text, text_rect)
+
+    # display metrics at the top left corner
+    comparisons_text = FONT.render(f"Comparisons: {comparisons_count}", True, WHITE)
+    swaps_text = FONT.render(f"Swaps: {swaps_count}", True, WHITE)
+    SCREEN.blit(comparisons_text, (10, 10))
+    SCREEN.blit(swaps_text, (10, 30))
 
     pygame.display.flip()
 
@@ -91,8 +105,13 @@ if __name__ == "__main__":
     print('\n')
     print("total swaps: ", total_swaps)
 
+    # testing with single step
+    comparisons = {0, 1}
+    swaps = None
+    sorted_indices = set() # no sorted indices yet
+
     # draw random bars
-    draw_bars(random_array)
+    draw_bars(random_array, comparisons=comparisons, swaps=swaps, sorted_indices=sorted_indices, comparisons_count=total_comparison, swaps_count=total_swaps)
 
     # keep running until we quit
     running = True
