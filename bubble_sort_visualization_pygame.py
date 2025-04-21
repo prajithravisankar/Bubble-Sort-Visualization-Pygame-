@@ -102,6 +102,7 @@ def main():
     # Initialize variables for step-by-step visualization
     current_step = 0
     auto_sort = False  # Tracks whether automatic sorting is enabled
+    clock = pygame.time.Clock()
 
     # Visualization loop
     running = True
@@ -119,6 +120,15 @@ def main():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
                 if current_step > 0:
                     current_step -= 1
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                auto_sort = not auto_sort # if on turn off, if off turn on
+
+        # automatically advance to next steps if auto_sort is enabled
+        if auto_sort and current_step < len(steps):
+            current_step += 1
+            pygame.time.delay(SPEED)
+
 
         # Apply steps up to current_step
         temp_array = array[:]  # Create a copy of the original array
@@ -140,6 +150,8 @@ def main():
         # Draw the bars based on the current step
         draw_bars(temp_array, comparisons=comparisons, swaps=swaps, sorted_indices=sorted_indices,
                   comparisons_count=total_comparisons, swaps_count=total_swaps)
+        
+        clock.tick(30)
 
     pygame.quit()
     sys.exit()
