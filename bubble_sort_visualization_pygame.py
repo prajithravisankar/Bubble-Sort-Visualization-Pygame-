@@ -30,7 +30,7 @@ def generate_random_array(size):
     """Generate a random array of integers."""
     return [random.randint(10, MAX_HEIGHT) for _ in range(size)]
 
-def draw_bars(array, comparisons=None, swaps=None, sorted_indices=None, comparisons_count=0, swaps_count=0):
+def draw_bars(array, comparisons=None, swaps=None, sorted_indices=None, comparisons_count=0, swaps_count=0, percentage_completion=0):
     """Draws the bars on the screen."""
     SCREEN.fill(BLACK)
 
@@ -57,8 +57,12 @@ def draw_bars(array, comparisons=None, swaps=None, sorted_indices=None, comparis
     # Display metrics at the top-left corner
     comparisons_text = FONT.render(f"Comparisons: {comparisons_count}", True, WHITE)
     swaps_text = FONT.render(f"Swaps: {swaps_count}", True, WHITE)
-    SCREEN.blit(comparisons_text, (10, 10))
-    SCREEN.blit(swaps_text, (10, 30))
+    percentage_text = FONT.render(f"Completion: {int(percentage_completion)}%", True, WHITE)
+
+    SCREEN.blit(comparisons_text, (0, 10))
+    SCREEN.blit(swaps_text, (0 + 200, 10))
+    SCREEN.blit(percentage_text, (0 + 200 + 200, 10))
+
 
     pygame.display.flip()
 
@@ -121,8 +125,16 @@ def main():
                 if current_step > 0:
                     current_step -= 1
 
+            # Toggle auto sort with 'Space'
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 auto_sort = not auto_sort # if on turn off, if off turn on
+
+            # regenerate array with 'R'
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                array = generate_random_array(ARRAY_SIZE)
+                steps, total_comparisons, total_swaps = bubble_sort_step_by_step(array[:])
+                current_step = 0
+                auto_sort = False
 
         # automatically advance to next steps if auto_sort is enabled
         if auto_sort and current_step < len(steps):
@@ -136,20 +148,29 @@ def main():
         swaps = None
         sorted_indices = set()
 
+        # tracking current comparisons and swaps
+        current_comparisons = 0
+        current_swaps = 0
+
         for step in steps[:current_step]:
             action, *indices = step
             if action == "compare":
                 comparisons = tuple(indices)
+                current_comparisons += 1
             elif action == "swap":
                 i, j = indices
                 temp_array[i], temp_array[j] = temp_array[j], temp_array[i]
                 swaps = tuple(indices)
+                current_swaps += 1
             elif action == "sorted":
                 sorted_indices.add(indices[0])
 
+        # Calculate percentage completion
+        percentage_completion = (current_step / len(steps)) * 100 if len(steps) > 0 else 0
+
         # Draw the bars based on the current step
         draw_bars(temp_array, comparisons=comparisons, swaps=swaps, sorted_indices=sorted_indices,
-                  comparisons_count=total_comparisons, swaps_count=total_swaps)
+                  comparisons_count=current_comparisons, swaps_count=current_swaps, percentage_completion=percentage_completion)
         
         clock.tick(30)
 
