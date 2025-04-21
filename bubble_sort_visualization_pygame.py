@@ -49,9 +49,28 @@ def draw_bars(array):
 
     pygame.display.flip()
 
+def bubble_sort(array):
+    """Sorts an array using the bubble sort algorithm."""
+    n = len(array)
+    for i in range(n):
+        """outer loop, worst case we have to go through all the elements"""
+        swapped = False
+        for j in range(0, n - i - 1):
+            """inner loop, we compare adjacent elements and put the larger one at the end"""
+            if array[j] > array[j + 1]:
+                array[j], array[j + 1] = array[j + 1], array[j]
+                swapped = True
+        if not swapped:
+            break
+    return array
+
 if __name__ == "__main__":
     random_array = generate_random_array(ARRAY_SIZE)
     print("generated array: ", random_array)
+
+    print("sorted array: ")
+    sorted_array = bubble_sort(random_array)
+    print(sorted_array)
 
     # draw random bars
     draw_bars(random_array)
